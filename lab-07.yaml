@@ -1,0 +1,73 @@
+
+Parameters:
+
+  InstanceType:
+    Description: WebServer EC2 instance type (has default, AllowedValues)
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+      - t1.micro
+      - t2.nano
+      - t2.micro
+    ConstraintDescription: Choose, t1.micro, t2.nana, t2.micro from the list. Default is t2.micro
+
+  InstanceName:
+    Description: Enter Your instance name
+    Type: String
+
+
+Resources:
+  
+  FrontEndEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+     ImageId: ami-0a1a70369f0fce06a
+     InstanceType: t1.micro
+     UserData:
+        Fn::Base64: |
+           #!/bin/bash
+           apt install HTTPD
+     Tags:
+     - Key: Name
+       Value: OferFrontEnd
+
+  APIServerEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      ImageId: ami-0a1a70369f0fce06a
+      UserData:
+        Fn::Base64: |
+           #!/bin/bash
+           apt install update
+           apt install java
+      Tags:
+      - Key: Name
+        Value: !Ref InstanceName
+  
+  WebServerEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+     ImageId: ami-0a1a70369f0fce06a
+     InstanceType: t1.micro
+     UserData:
+        Fn::Base64: |
+           #!/bin/bash
+           apt install update
+           apt install php
+           apt install HTTPD
+           service httpd restart
+     Tags:
+     - Key: Name
+       Value: OferWebServer
+
+  MySQLDB:
+    Type: 'AWS::RDS::DBInstance'
+    Properties:
+      DBName: OferSQLDB
+      DBInstanceClass: db.t3.micro
+      AllocatedStorage: '20'
+      Engine: MySQL
+      EngineVersion: "8.0.31"
+      MasterUsername: Admin
+      MasterUserPassword: 'Aa123456789!'
